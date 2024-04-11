@@ -24,12 +24,15 @@ $posts = $stmt->get_result();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
         .sidebar {
@@ -45,7 +48,32 @@ $posts = $stmt->get_result();
         }
     </style>
 </head>
+
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="add_post.php">
+                            <i class="fas fa-plus"></i> Ajouter un Post
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logout.php">
+                            <i class="fas fa-sign-out-alt"></i> Déconnecter
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -53,38 +81,56 @@ $posts = $stmt->get_result();
                 <h3>Profil</h3>
                 <p><strong>Nom d'utilisateur:</strong> <?php echo $user['name']; ?></p>
                 <p><strong>Email:</strong> <?php echo $user['email']; ?></p>
-                <a href="logout.php" class="btn btn-danger">Déconnecter</a>
-
-                <!-- Ajouter un post -->
-                <a href="add_post.php" class="btn btn-primary mt-3">Ajouter un Post</a>
             </div>
 
             <!-- Contenu principal -->
             <div class="col-md-9">
                 <h1>Liste des Posts</h1>
-                <?php while ($row = $posts->fetch_assoc()): ?>
+                <?php while ($row = $posts->fetch_assoc()) : ?>
                     <div class="post">
                         <h3><?php echo $row['title']; ?></h3>
                         <p><?php echo $row['content']; ?></p>
-                        <?php if (!empty($row['image'])): ?>
+                        <?php if (!empty($row['image'])) : ?>
                             <!-- Chemin d'accès à l'image -->
-                            <?php $imagePath = "uploads/" . $row['image']; ?>
+                            <?php $imagePath = $row['image']; ?>
 
                             <!-- Vérifier si l'image existe -->
-                            <?php if (file_exists($imagePath)): ?>
+                            <?php if (file_exists($imagePath)) : ?>
                                 <img src="<?php echo $imagePath; ?>" alt="Image" class="img-fluid">
-                            <?php else: ?>
+                            <?php else : ?>
                                 <p>Image not found: <?php echo $row['image']; ?></p>
                             <?php endif; ?>
                         <?php endif; ?>
 
+                        <!-- Afficher le nombre de likes -->
+                        <p>Nombre de Likes: <?php echo $row['likes']; ?></p>
+
+                        <!-- Bouton de Like -->
+                        <form id="likeForm_<?php echo $row['id']; ?>" action="likes.php" method="POST" style="display: inline;">
+                            <input type="hidden" name="post_id" value="<?php echo $row['id']; ?>">
+                            <?php
+                            // Vérifier si l'utilisateur a déjà aimé le post
+                            $stmt = $conn->prepare("SELECT * FROM likes WHERE post_id = ? AND user_id = ?");
+                            $stmt->bind_param("ii", $row['id'], $_SESSION['user_id']);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            if ($result->num_rows > 0) {
+                                // L'utilisateur a déjà aimé le post, donc afficher le bouton "Unlike"
+                                echo '<button type="submit" class="btn btn-link text-danger"><i class="fas fa-thumbs-down"></i> Unlike</button>';
+                            } else {
+                                // L'utilisateur n'a pas encore aimé le post, donc afficher le bouton "Like"
+                                echo '<button type="submit" class="btn btn-link text-success"><i class="fas fa-thumbs-up"></i> Like</button>';
+                            }
+                            ?>
+                        </form>
+
                         <!-- Modifier un post -->
-                        <a href="edit_post.php?id=<?php echo $row['id']; ?>" class="btn btn-warning">Modifier</a>
+                        <a href="edit_post.php?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-edit"></i> Modifier</a>
                     </div>
                 <?php endwhile; ?>
 
                 <!-- Afficher un message si aucun post n'est disponible -->
-                <?php if ($posts->num_rows === 0): ?>
+                <?php if ($posts->num_rows === 0) : ?>
                     <p>Aucun post disponible.</p>
                 <?php endif; ?>
             </div>
@@ -94,4 +140,6 @@ $posts = $stmt->get_result();
     <!-- Bootstrap JS (optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
+

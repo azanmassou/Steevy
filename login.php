@@ -26,6 +26,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
+        if ($user['email']  === 'azanmassouhappylouis@gmail.com') {
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['success'] = "Connexion réussie";
+                header("Location: admin.php");
+                exit();
+            } else {
+                $_SESSION['error'] = "Mot de passe incorrect";
+                $_SESSION['old_values'] = $_POST;
+                header("Location: login.php");
+                exit();
+            }
+        }
+
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['success'] = "Connexion réussie";
@@ -51,6 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,14 +73,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light">
+
+<style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        /* .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding-top: 100px;
+        } */
+
+        h1 {
+            color: #4e5166;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #4e5166;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .btn-primary {
+            background-color:  #fd2d01;
+            border-color: #4e5166;
+            padding: 10px 40px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #3c3e4d;
+            border-color: #3c3e4d;
+        }
+    </style>
+<body>
     <div class="container">
         <div class="row justify-content-center mt-5">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
                         <h3 class="card-title text-center">Connexion</h3>
-                        <?php if (isset($_SESSION['error'])): ?>
+                        <?php if (isset($_SESSION['error'])) : ?>
                             <div class="alert alert-danger"><?php echo $_SESSION['error']; ?></div>
                             <?php unset($_SESSION['error']); ?>
                         <?php endif; ?>
@@ -83,13 +136,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <!-- Bouton d'inscription -->
                     <div class="text-center mt-3">
-                            <a href="register.php" class="btn btn-link">S'inscrire</a>
-                        </div>
+                        <a href="register.php" class="btn btn-link">S'inscrire</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>
 
 <?php

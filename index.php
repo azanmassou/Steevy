@@ -4,16 +4,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accueil</title>
+    <title>Groupomania - Accueil</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        h1 {
+            color: #4e5166;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #4e5166;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .btn-primary {
+            background-color:  #fd2d01;
+            border-color: #4e5166;
+            padding: 10px 40px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #3c3e4d;
+            border-color: #3c3e4d;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container text-center my-5">
-        <h1 class="my-3">Bienvenue sur la page officielle de GroupoMania</h1>
-        <p class="my-3">Demmarer votre session</p>
-        <a href="login.php" class="btn btn-primary">Commercer</a>
+    <div class="container">
+        <h1>Bienvenue sur Groupomania</h1>
+        <p>Plateforme interne de communication et de partage pour notre entreprise</p>
+        <a href="login.php" class="btn btn-primary">Commencer</a>
     </div>
 
     <!-- Bootstrap JS -->
