@@ -16,8 +16,21 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-// Récupérer tous les posts depuis la base de données
-$stmt = $conn->prepare("SELECT * FROM posts");
+// Pagination
+$posts_per_page = 6;
+$stmt = $conn->prepare("SELECT COUNT(*) AS total FROM posts");
+$stmt->execute();
+$total_result = $stmt->get_result();
+$row = $total_result->fetch_assoc();
+$total_posts = $row['total'];
+$total_pages = ceil($total_posts / $posts_per_page);
+
+$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+$offset = ($current_page - 1) * $posts_per_page;
+
+// Requête pour récupérer les posts en ordre récent de création avec pagination
+$stmt = $conn->prepare("SELECT * FROM posts ORDER BY created_at DESC LIMIT ?, ?");
+$stmt->bind_param("ii", $offset, $posts_per_page);
 $stmt->execute();
 $posts = $stmt->get_result();
 ?>
@@ -53,8 +66,7 @@ $posts = $stmt->get_result();
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Dashboard</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -86,53 +98,86 @@ $posts = $stmt->get_result();
             <!-- Contenu principal -->
             <div class="col-md-9">
                 <h1>Liste des Posts</h1>
-                <?php while ($row = $posts->fetch_assoc()) : ?>
-                    <div class="post">
-                        <h3><?php echo $row['title']; ?></h3>
-                        <p><?php echo $row['content']; ?></p>
-                        <?php if (!empty($row['image'])) : ?>
-                            <!-- Chemin d'accès à l'image -->
-                            <?php $imagePath = $row['image']; ?>
+                <div class="row">
+                    <?php while ($row = $posts->fetch_assoc()) : ?>
+                        <div class="col-sm-4">
 
-                            <!-- Vérifier si l'image existe -->
-                            <?php if (file_exists($imagePath)) : ?>
-                                <img src="<?php echo $imagePath; ?>" alt="Image" class="img-fluid">
-                            <?php else : ?>
-                                <p>Image not found: <?php echo $row['image']; ?></p>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                            <div class="post">
+                                <h3><?php echo $row['title']; ?></h3>
+                                <p><?php echo $row['content']; ?></p>
+                                <?php if (!empty($row['image'])) : ?>
+                                    <!-- Chemin d'accès à l'image -->
+                                    <?php $imagePath = $row['image']; ?>
 
-                        <!-- Afficher le nombre de likes -->
-                        <p>Nombre de Likes: <?php echo $row['likes']; ?></p>
+                                    <!-- Vérifier si l'image existe -->
+                                    <?php if (file_exists($imagePath)) : ?>
+                                        <img src="<?php echo $imagePath; ?>" alt="Image" class="img-fluid">
+                                    <?php else : ?>
+                                        <p>Image not found: <?php echo $row['image']; ?></p>
+                                    <?php endif; ?>
+                                <?php endif; ?>
 
-                        <!-- Bouton de Like -->
-                        <form id="likeForm_<?php echo $row['id']; ?>" action="likes.php" method="POST" style="display: inline;">
-                            <input type="hidden" name="post_id" value="<?php echo $row['id']; ?>">
-                            <?php
-                            // Vérifier si l'utilisateur a déjà aimé le post
-                            $stmt = $conn->prepare("SELECT * FROM likes WHERE post_id = ? AND user_id = ?");
-                            $stmt->bind_param("ii", $row['id'], $_SESSION['user_id']);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
-                            if ($result->num_rows > 0) {
-                                // L'utilisateur a déjà aimé le post, donc afficher le bouton "Unlike"
-                                echo '<button type="submit" class="btn btn-link text-danger"><i class="fas fa-thumbs-down"></i> Unlike</button>';
-                            } else {
-                                // L'utilisateur n'a pas encore aimé le post, donc afficher le bouton "Like"
-                                echo '<button type="submit" class="btn btn-link text-success"><i class="fas fa-thumbs-up"></i> Like</button>';
-                            }
-                            ?>
-                        </form>
+                                <!-- Afficher le nombre de likes -->
+                                <p>Nombre de Likes: <?php echo $row['likes']; ?></p>
 
-                        <!-- Modifier un post -->
-                        <a href="edit_post.php?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-edit"></i> Modifier</a>
-                    </div>
-                <?php endwhile; ?>
+                                <!-- Bouton de Like -->
+                                <form id="likeForm_<?php echo $row['id']; ?>" action="likes.php" method="POST" style="display: inline;">
+                                    <input type="hidden" name="post_id" value="<?php echo $row['id']; ?>">
+                                    <?php
+                                    // Vérifier si l'utilisateur a déjà aimé le post
+                                    $stmt = $conn->prepare("SELECT * FROM likes WHERE post_id = ? AND user_id = ?");
+                                    $stmt->bind_param("ii", $row['id'], $_SESSION['user_id']);
+                                    $stmt->execute();
+                                    $result = $stmt->get_result();
+                                    if ($result->num_rows > 0) {
+                                        // L'utilisateur a déjà aimé le post, donc afficher le bouton "Unlike"
+                                        echo '<button type="submit" class="btn btn-link text-danger"><i class="fas fa-thumbs-down"></i> Unlike</button>';
+                                    } else {
+                                        // L'utilisateur n'a pas encore aimé le post, donc afficher le bouton "Like"
+                                        echo '<button type="submit" class="btn btn-link text-success"><i class="fas fa-thumbs-up"></i> Like</button>';
+                                    }
+                                    ?>
+                                </form>
+
+                                <!-- Modifier un post -->
+                                <a href="edit_post.php?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-edit"></i> Modifier</a>
+                            </div>
+
+                        </div>
+                    <?php endwhile; ?>
+                </div>
 
                 <!-- Afficher un message si aucun post n'est disponible -->
                 <?php if ($posts->num_rows === 0) : ?>
                     <p>Aucun post disponible.</p>
                 <?php endif; ?>
+
+                <!-- Pagination -->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <?php if ($current_page > 1) : ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?php echo $current_page - 1; ?>" aria-label="Précédent">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                            <li class="page-item <?php if ($i == $current_page) echo 'active'; ?>">
+                                <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <?php if ($current_page < $total_pages) : ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?php echo $current_page + 1; ?>" aria-label="Suivant">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
@@ -142,4 +187,3 @@ $posts = $stmt->get_result();
 </body>
 
 </html>
-

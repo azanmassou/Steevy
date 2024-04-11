@@ -37,7 +37,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Déplacer le fichier uploadé vers le répertoire de stockage
     if (move_uploaded_file($image["tmp_name"], $target_file)) {
         // Insertion du nouveau post dans la base de données
-        $stmt = $conn->prepare("INSERT INTO posts (title, content, image) VALUES (?, ?, ?)");
+        // Date actuelle pour created_at
+        $created_at = date("Y-m-d H:i:s");
+        $stmt = $conn->prepare("INSERT INTO posts (title, content, image,created_at) VALUES (?, ?, ?,NOW())");
         $stmt->bind_param("sss", $title, $content, $target_file);
         $stmt->execute();
 
@@ -57,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -64,10 +67,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container mt-5">
         <h2>Ajouter un Post avec Image</h2>
-        <?php if (isset($_SESSION['error'])): ?>
+        <?php if (isset($_SESSION['error'])) : ?>
             <div class="alert alert-danger"><?php echo $_SESSION['error']; ?></div>
             <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
@@ -91,4 +95,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Bootstrap JS (optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
