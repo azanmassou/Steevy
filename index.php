@@ -33,7 +33,7 @@
         }
 
         .btn-primary {
-            background-color:  #fd2d01;
+            background-color: #fd2d01;
             border-color: #4e5166;
             padding: 10px 40px;
             font-size: 20px;
@@ -48,10 +48,17 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Bienvenue sur Groupomania</h1>
-        <p>Plateforme interne de communication et de partage pour notre entreprise</p>
-        <a href="login.php" class="btn btn-primary">Commencer</a>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="container">
+                <!-- <h1>Bienvenue sur Groupomania</h1> -->
+                <img src="Logos/icon-left-font-monochrome-black.svg" alt="">
+                <p>Plateforme interne de communication et de partage pour notre entreprise</p>
+                <a href="login.php" class="btn btn-primary">Commencer</a>
+            </div>
+        </div>
+
     </div>
 
     <!-- Bootstrap JS -->

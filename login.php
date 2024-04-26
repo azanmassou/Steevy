@@ -112,17 +112,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 <body>
+    
     <div class="container">
+   
         <div class="row justify-content-center mt-5">
             <div class="col-md-6">
                 <div class="card">
+                    
                     <div class="card-body">
-                        <h3 class="card-title text-center">Connexion</h3>
+                        <!-- <h3 class="card-title text-center">Connexion</h3> -->
+                        <img src="Logos/icon-left-font-monochrome-black.svg" class="my-2" alt="">
                         <?php if (isset($_SESSION['error'])) : ?>
                             <div class="alert alert-danger"><?php echo $_SESSION['error']; ?></div>
                             <?php unset($_SESSION['error']); ?>
                         <?php endif; ?>
-                        <form action="login.php" method="POST">
+                        <form action="login.php" method="POST" class="my-1">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email:</label>
                                 <input type="email" class="form-control" id="email" name="email" value="<?php echo isset($_SESSION['old_values']['email']) ? $_SESSION['old_values']['email'] : ''; ?>" required>

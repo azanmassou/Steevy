@@ -47,6 +47,7 @@ $posts = $stmt->get_result();
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
+    <link rel="icon" href="Logos/icon-left-font.svg">
     <style>
         .sidebar {
             background-color: #f8f9fa;
@@ -65,12 +66,18 @@ $posts = $stmt->get_result();
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Dashboard</a>
+            <a class="navbar-brand" href="#"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <!-- <a class="nav-link" href="add_post.php">
+                            <i class="fas fa-plus"></i> Ajouter un Post
+                        </a> -->
+                        <img src="Logos/1653474647318_icon-left-font.png" width="160px" alt="">
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="add_post.php">
                             <i class="fas fa-plus"></i> Ajouter un Post
@@ -90,9 +97,12 @@ $posts = $stmt->get_result();
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-3 sidebar">
-                <h3>Profil</h3>
-                <p><strong>Nom d'utilisateur:</strong> <?php echo $user['name']; ?></p>
-                <p><strong>Email:</strong> <?php echo $user['email']; ?></p>
+                <div class="container">
+                    <!-- <img src="Logos/1653474647318_icon-left-font.png" width="160px" alt=""> -->
+                    <h3>Profil</h3>
+                    <p><strong>Nom d'utilisateur:</strong> <?php echo $user['name']; ?></p>
+                    <p><strong>Email:</strong> <?php echo $user['email']; ?></p>
+                </div>
             </div>
 
             <!-- Contenu principal -->
@@ -103,7 +113,7 @@ $posts = $stmt->get_result();
                         <div class="col-sm-4">
 
                             <div class="post">
-                                <h3><?php echo $row['title']; ?></h3>
+                                <h3></h3>
                                 <p><?php echo $row['content']; ?></p>
                                 <?php if (!empty($row['image'])) : ?>
                                     <!-- Chemin d'accès à l'image -->
